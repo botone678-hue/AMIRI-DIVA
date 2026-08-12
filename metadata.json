@@ -1,0 +1,6 @@
+{
+  "name": "Amiri Diva",
+  "description": "Luxury beauty and cosmetics collection based in Eldoret, Kenya with Pochi la Biashara payments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
