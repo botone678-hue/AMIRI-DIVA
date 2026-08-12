@@ -1,14 +1,37 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Order, PaymentStatus, OrderStatus, AuditLogEntry, Product } from '../types';
 
-const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
+const rawUrl = (import.meta as any).env?.VITE_SUPABASE_URL || '';
+const rawKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+function isValidHttpUrl(stringUrl: string): boolean {
+  if (!stringUrl || typeof stringUrl !== 'string') return false;
+  try {
+    const url = new URL(stringUrl);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
 
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+export const isSupabaseConfigured = Boolean(
+  rawUrl &&
+  rawKey &&
+  isValidHttpUrl(rawUrl)
+);
+
+let supabaseClient: SupabaseClient | null = null;
+
+if (isSupabaseConfigured) {
+  try {
+    supabaseClient = createClient(rawUrl, rawKey);
+  } catch (e) {
+    console.warn('Failed to initialize Supabase client:', e);
+    supabaseClient = null;
+  }
+}
+
+export const supabase = supabaseClient;
 
 const ORDERS_LOCAL_KEY = 'amiri_diva_orders_v1';
 const PRODUCTS_LOCAL_KEY = 'amiri_diva_products_v1';
